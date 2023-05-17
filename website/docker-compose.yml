@@ -1,0 +1,22 @@
+services:
+  website:
+    image: "sgoudham/website:latest"
+    container_name: "website"
+    restart: "unless-stopped"
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.website.rule=Host(`goudham.com`)"
+      - "traefik.http.routers.website.entrypoints=websecure"
+      - "traefik.http.routers.website.tls.certresolver=myresolver"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:3000"]
+      interval: "30s"
+      timeout: "5s"
+      retries: 3
+
+networks:
+  proxy:
+    external: true
+

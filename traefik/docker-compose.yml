@@ -1,0 +1,33 @@
+services:
+  traefik:
+    image: "traefik:v2.9"
+    container_name: "traefik"
+    env_file: ".env"
+    restart: unless-stopped
+    networks:
+      - "proxy"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "430:430"
+    volumes:
+      - "./traefik.yml:/traefik.yml:ro"
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.goudham.com`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=hammy:$$apr1$$v4aHQIC3$$8C8ojR5S4IYbWaXLwGd1o/"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck"]
+      interval: "30s"
+      timeout: "5s"
+      retries: 3
+
+networks:
+  proxy:
+    external: true

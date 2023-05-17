@@ -1,0 +1,37 @@
+entryPoints:
+  ssh:
+    address: ":430"
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: "sgoudham@gmail.com"
+      storage: "/letsencrypt/acme.json"
+      dnsChallenge:
+        provider: porkbun
+
+providers:
+  docker:
+    endpoint: unix:///var/run/docker.sock
+    watch: true
+    network: proxy
+    exposedByDefault: false
+
+api:
+  dashboard: true
+
+log:
+  level: DEBUG
+
+accessLog: {}
+ping: {}

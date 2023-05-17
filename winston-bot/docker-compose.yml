@@ -1,0 +1,6 @@
+services:
+  winston-bot:
+    image: sgoudham/winston-bot:latest
+    container_name: winston-bot
+    restart: always
+    env_file: .env
